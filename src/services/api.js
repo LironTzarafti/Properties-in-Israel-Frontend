@@ -2,7 +2,7 @@
 // API Service - שירות לתקשורת עם השרת
 // ========================================
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://properties-in-israel-backend.onrender.com/api;
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://properties-in-israel-backend.onrender.com/api';
 
 // פונקציה עזר ליצירת headers עם token
 const getAuthHeaders = () => {
