@@ -1,0 +1,254 @@
+/* Settings.module.css */
+
+/* --- Container --- */
+.settingsContainer {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 30px 25px;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgb(0 0 0 / 0.1);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #1f2937;
+  direction: rtl;
+}
+
+/* --- Header --- */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+  gap: 10px;
+}
+
+.backBtn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.backBtn:hover {
+  background: #2563eb;
+}
+
+/* --- Content --- */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 35px;
+}
+
+/* --- Section --- */
+.section {
+  background: white;
+  border-radius: 12px;
+  padding: 25px 30px;
+  box-shadow: 0 3px 12px rgb(0 0 0 / 0.07);
+}
+
+.sectionTitle {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.settingItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.settingInfo {
+  max-width: 80%;
+}
+
+.settingInfo label {
+  font-weight: 600;
+  font-size: 1rem;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.settingInfo p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* --- Switch --- */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #ccc;
+  border-radius: 24px;
+  transition: 0.4s;
+}
+
+.slider::before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #3b82f6;
+}
+
+input:checked + .slider::before {
+  transform: translateX(18px);
+}
+
+/* --- Link Buttons --- */
+.linkButton {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 14px 15px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
+  color: #3b82f6;
+}
+
+.linkButton:hover {
+  background: #e0f2fe;
+}
+
+.linkButton span:last-child {
+  font-size: 1.3rem;
+}
+
+/* Delete Account Button */
+.linkButton span:first-child {
+  color: #dc2626;
+}
+
+/* --- Save Button --- */
+.saveSection {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.saveBtn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 16px 42px;
+  border-radius: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 15px rgb(16 185 129 / 0.5);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saveBtn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+}
+
+/* --- Modal Overlay --- */
+.modalOverlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  animation: fadeIn 0.3s forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* --- Modal Content --- */
+.modalContent {
+  background: white;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  max-height: 80vh;
+  overflow-y: auto;
+  transform: translateY(-20px);
+  animation: slideDown 0.3s forwards;
+}
+
+@keyframes slideDown {
+  to { transform: translateY(0); }
+}
+
+/* --- Modal Close Button --- */
+.modalClose {
+  position: absolute;
+  top: 0.5rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6b7280;
+  transition: color 0.2s ease;
+}
+
+.modalClose:hover {
+  color: #dc2626;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .settingsContainer {
+    padding: 20px 15px;
+    max-width: 100%;
+  }
+  .settingItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .settingInfo {
+    max-width: 100%;
+  }
+}

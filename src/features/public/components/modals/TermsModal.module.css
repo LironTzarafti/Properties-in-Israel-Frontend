@@ -1,0 +1,52 @@
+/* src/features/public/components/modals/TermsModal.module.css */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .modalContent {
+    background: white;
+    padding: 25px 30px;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    text-align: right;
+    direction: rtl;
+  }
+  
+  .checkboxLabel {
+    display: block;
+    margin-top: 20px;
+    font-weight: 600;
+  }
+  
+  .agreeBtn {
+    margin-top: 15px;
+    padding: 10px 25px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .agreeBtn:disabled {
+    background: #94d3b2;
+    cursor: not-allowed;
+  }
+  
+  .agreeBtn:not(:disabled):hover {
+    background: #059669;
+  }
+  

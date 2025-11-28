@@ -1,0 +1,308 @@
+/* Container כללי */
+.dashboardContainer {
+  width: 100%;
+  margin: 0;
+  padding: clamp(16px, 3vw, 24px);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  direction: rtl;
+  background-color: #f8fafc;
+}
+
+/* כרטיסים בסיסיים */
+.actions, .filters, .statCard, .guestCard, .noPropertiesCard {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #1e40af, #3b82f6);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  color: white;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.subtitle {
+  margin: 0;
+  opacity: 0.9;
+}
+
+/* פעולות */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.addPropertyButton {
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 16px 32px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  align-self: flex-start;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.addPropertyButton:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* כפתורי תצוגה */
+.viewModeButtons {
+  display: flex;
+  gap: 8px;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 8px;
+  width: fit-content;
+}
+
+.viewModeBtn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.viewModeBtn.active {
+  background: #3b82f6;
+  color: white;
+}
+
+/* סינון - בסיס משותף */
+.filterGroup {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.searchInput, .statusFilter {
+  padding: 14px 18px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  transition: all 0.2s;
+  background: white;
+  font-family: inherit;
+  font-size: 1.05rem;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.searchInput {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Select מותאם */
+.statusFilter {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23374151' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: left 12px center;
+  background-size: 16px;
+  padding-left: 40px;
+}
+
+.statusFilter:hover {
+  border-color: #cbd5e1;
+  background-color: #f8fafc;
+}
+
+.statusFilter:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+/* 🎯 רשימת נכסים - תיקון הבעיה */
+.propertyList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); /* 🆕 שינוי מ-auto-fit ל-auto-fill */
+  gap: 20px;
+  align-items: stretch;
+  justify-items: center; /* 🆕 ממרכז את הכרטיסים */
+}
+
+/* 🆕 הגבלת רוחב הכרטיסים */
+.propertyList > * {
+  width: 100%;
+  max-width: 450px; /* 🆕 כרטיס לא יעבור 450px */
+}
+
+/* סטטיסטיקות */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.statCard {
+  text-align: center;
+  transition: transform 0.2s;
+  margin-bottom: 0;
+}
+
+.statCard:hover {
+  transform: translateY(-2px);
+}
+
+.statNumber {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+.statLabel {
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* הודעות */
+.guestCard, .noPropertiesCard {
+  text-align: center;
+  padding: 24px;
+}
+
+.guestMessage {
+  text-align: center;
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+
+.noProperties {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.authLink {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.authLink:hover {
+  text-decoration: underline;
+}
+
+/* רספונסיבי */
+@media (max-width: 1024px) {
+  .dashboardContainer {
+    padding: clamp(16px, 3vw, 24px);
+  }
+  
+  .propertyList {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    gap: clamp(16px, 2.5vw, 20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboardContainer { 
+    padding: clamp(12px, 2.5vw, 16px); 
+  }
+  
+  .title { 
+    font-size: clamp(1.25rem, 4vw, 1.5rem); 
+  }
+  
+  .header {
+    padding: clamp(16px, 3vw, 24px);
+  }
+  
+  .filterGroup { 
+    flex-direction: column; 
+    gap: 12px;
+  }
+  
+  .searchInput {
+    min-width: 100%;
+  }
+  
+  .propertyList { 
+    grid-template-columns: 1fr; 
+    gap: clamp(12px, 2vw, 16px);
+  }
+  
+  /* 🆕 במובייל - כרטיסים תופסים את כל הרוחב */
+  .propertyList > * {
+    max-width: 100%;
+  }
+  
+  .stats { 
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr));
+    gap: 12px;
+  }
+  
+  .actions,
+  .filters,
+  .statCard,
+  .guestCard,
+  .noPropertiesCard {
+    padding: clamp(16px, 3vw, 20px);
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboardContainer {
+    padding: 12px;
+  }
+  
+  .title {
+    font-size: 1.25rem;
+  }
+  
+  .viewModeButtons {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  
+  .viewModeBtn {
+    flex: 1;
+    min-width: 80px;
+    padding: 6px 12px;
+    font-size: 0.875rem;
+  }
+}

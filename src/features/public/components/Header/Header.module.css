@@ -1,0 +1,203 @@
+.header {
+  background: linear-gradient(135deg, #1e40af, #3b82f6);
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding-bottom: 8px;
+}
+
+/* פס עליון */
+.topBar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 12px 30px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.rightLinks {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* קונטיינר של התראות ופרופיל */
+.userControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* לינקים */
+.authLink {
+  color: white;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+.authLink:hover {
+  background: #fbbf24;
+  color: #1f2937;
+  border-color: #fbbf24;
+  transform: translateY(-2px);
+}
+
+/* ניווט ראשי */
+.mainNav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 20px 60px; /* שמירת padding גבוה גם במובייל */
+  background: linear-gradient(135deg, #1e40af, #3b82f6);
+}
+
+/* כפתור חזור - צד שמאל */
+.backBtn {
+  position: absolute;
+  left: 20px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  white-space: nowrap;
+  user-select: none;
+}
+.backBtn:hover {
+  background: #2563eb;
+}
+
+/* הכותרת במרכז מוחלט */
+.logo {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: white;
+  white-space: nowrap;
+  transition: transform 0.3s;
+}
+.logo:hover {
+  transform: translateX(-50%) scale(1.05);
+}
+
+/* ניווט בקצה ימני */
+.navLinks {
+  position: absolute;
+  right: 20px;
+  display: flex;
+  gap: 32px;
+  align-items: center;
+}
+.navLink {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  position: relative;
+  transition: color 0.3s;
+  white-space: nowrap;
+}
+.navLink:hover {
+  color: #fbbf24;
+}
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #fbbf24;
+  transition: width 0.3s;
+}
+.navLink:hover::after {
+  width: 100%;
+}
+
+/* Mobile Menu Button */
+.mobileMenuBtn {
+  display: none;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: none;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.mobileMenuBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .navLinks {
+    display: none; /* מאפשר להוסיף תפריט מובייל חלופי */
+  }
+  .backBtn {
+    padding: clamp(5px, 1.5vw, 6px) clamp(8px, 2vw, 10px);
+    font-size: clamp(0.75rem, 2vw, 0.8rem);
+    left: clamp(12px, 2.5vw, 15px);
+  }
+  .logo {
+    font-size: clamp(1.2rem, 3.5vw, 1.4rem);
+  }
+  .mainNav {
+    padding: clamp(16px, 3vw, 20px) clamp(30px, 5vw, 40px);
+  }
+  
+  .topBar {
+    padding: clamp(10px, 2vw, 12px) clamp(20px, 4vw, 30px);
+  }
+  
+  .authLink {
+    font-size: clamp(0.7rem, 2vw, 0.875rem);
+    padding: clamp(6px, 1.5vw, 8px) clamp(12px, 2.5vw, 16px);
+  }
+}
+
+@media (max-width: 480px) {
+  .backBtn {
+    padding: clamp(4px, 1.5vw, 5px) clamp(6px, 2vw, 8px);
+    font-size: clamp(0.7rem, 2vw, 0.75rem);
+    left: clamp(10px, 2.5vw, 12px);
+  }
+  .logo {
+    font-size: clamp(1rem, 3vw, 1.2rem);
+  }
+  .topBar {
+    padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2.5vw, 12px);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .authLink {
+    font-size: clamp(0.65rem, 2vw, 0.75rem);
+    padding: clamp(4px, 1.5vw, 5px) clamp(8px, 2vw, 10px);
+  }
+  .mainNav {
+    padding: clamp(16px, 3vw, 20px) clamp(20px, 4vw, 30px);
+  }
+  
+  .rightLinks {
+    gap: clamp(8px, 2vw, 16px);
+  }
+}

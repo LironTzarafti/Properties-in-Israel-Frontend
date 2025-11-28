@@ -1,0 +1,343 @@
+.filtersContainer {
+    background: white;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    direction: rtl;
+  }
+  
+  /* שורת פילטרים בסיסית */
+  .basicFilters {
+    display: grid;
+    grid-template-columns: 2fr repeat(3, 1fr) auto;
+    gap: 15px;
+    margin-bottom: 15px;
+    align-items: end;
+  }
+  
+  .filterGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0; /* מונע overflow */
+  }
+  
+  .filterLabel {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b5563;
+    padding-right: 4px;
+  }
+  
+  .searchInput {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: all 0.3s;
+    box-sizing: border-box;
+  }
+  
+  .searchInput:focus {
+    outline: none;
+    border-color: #2196f3;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+  }
+  
+  .select {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 16px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-sizing: border-box;
+  }
+  
+  .select:hover {
+    border-color: #2196f3;
+  }
+  
+  .select:focus {
+    outline: none;
+    border-color: #2196f3;
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+  }
+  
+  .advancedToggle {
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+    align-self: end;
+    height: fit-content;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+  
+  .advancedToggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+  
+  /* פילטרים מתקדמים */
+  .advancedFilters {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+ .rangeFilter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+  
+  .rangeFilter label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+  }
+  
+  .rangeInputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .rangeInputs input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+  }
+  
+  .rangeInputs input:focus {
+    outline: none;
+    border-color: #2196f3;
+  }
+  
+  .rangeInputs span {
+    color: #666;
+    font-weight: bold;
+  }
+  
+  /* תכונות נוספות */
+  .features {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding-top: 10px;
+    border-top: 2px solid #e0e0e0;
+  }
+  
+  .checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px 16px;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+    user-select: none;
+  }
+  
+  .checkbox:hover {
+    border-color: #2196f3;
+    background: #f0f7ff;
+  }
+  
+  .checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #2196f3;
+  }
+  
+  .checkbox input[type="checkbox"]:checked + span {
+    color: #2196f3;
+  }
+  
+  /* שורת מיון */
+  .sortBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid #e0e0e0;
+  }
+  
+  .resultsCount {
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .resultsCount strong {
+    color: #2196f3;
+    font-size: 20px;
+  }
+  
+  .sortSelect {
+    padding: 10px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .sortSelect:hover,
+  .sortSelect:focus {
+    border-color: #2196f3;
+    outline: none;
+  }
+  
+  .resetButton {
+    padding: 10px 20px;
+    background: #ff5252;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  
+  .resetButton:hover {
+    background: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+  }
+  
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .basicFilters {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+  
+    .filterGroup:first-child {
+      grid-column: 1 / -1;
+    }
+  
+    .advancedToggle {
+      grid-column: 1 / -1;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .filtersContainer {
+      padding: 15px;
+      overflow: hidden;
+    }
+  
+    .basicFilters {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+  
+    .filterGroup {
+      width: 100%;
+    }
+  
+    .searchInput,
+    .select,
+    .advancedToggle {
+      width: 100%;
+      max-width: 100%;
+      font-size: 14px;
+      padding: 12px;
+      box-sizing: border-box;
+    }
+  
+    .select {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  
+    .advancedToggle {
+      white-space: normal;
+      text-align: center;
+    }
+  
+.advancedFilters {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+  
+    .rangeInputs {
+      width: 100%;
+    }
+  
+    .rangeInputs input {
+      font-size: 14px;
+      padding: 10px 8px;
+      min-width: 0;
+    }
+  
+    .features {
+      gap: 10px;
+    }
+  
+    .checkbox {
+      font-size: 13px;
+      padding: 8px 12px;
+      flex: 0 0 auto;
+    }
+  
+    .sortBar {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+  
+    .resultsCount {
+      text-align: center;
+      font-size: 15px;
+    }
+  
+    .sortSelect,
+    .resetButton {
+      width: 100%;
+      max-width: 100%;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+  }

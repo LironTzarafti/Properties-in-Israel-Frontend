@@ -1,0 +1,108 @@
+/* ===== רקע מלא חזק ומרשים ===== */
+body {
+  background: linear-gradient(135deg, #1e40af, #3b82f6);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* אלמנט אלכסוני יוקרתי מאחורה */
+.authBackgroundAccent {
+  position: fixed;
+  top: -120px;
+  left: -120px;
+  width: 450px;
+  height: 450px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 40%;
+  transform: rotate(25deg);
+  filter: blur(20px);
+  z-index: 0;
+}
+
+/* ===== קונטיינר כללי ===== */
+.authContainer {
+  width: 95%;
+  max-width: 520px; /* הרבה יותר גדול */
+  margin: 80px auto;
+  padding: 40px; /* מרווח משמעותית יותר */
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 12px 45px rgba(0, 0, 0, 0.28); /* צל חזק */
+  direction: rtl;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 5;
+}
+
+/* ===== כותרת הרבה יותר מרשימה ===== */
+.authContainer h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #111827;
+  font-size: 2rem; /* הרבה יותר גדול */
+  font-weight: 800;
+}
+
+/* ===== טופס ===== */
+.authForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ===== שדות ===== */
+.authForm input,
+.authForm button {
+  padding: 16px; /* הרבה יותר גדול ונעים */
+  font-size: 1.15rem;
+  border-radius: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.authForm input {
+  border: 2px solid #d1d5db;
+  background: #f9fafb;
+}
+
+.authForm input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background: white;
+}
+
+/* ===== כפתור ===== */
+.authForm button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.2rem; /* גדול ומרשים */
+  transition: all 0.25s ease;
+}
+
+.authForm button:hover {
+  background: #2563eb;
+  transform: translateY(-3px);
+}
+
+/* ===== קישור מעבר ===== */
+.authSwitchLink {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1rem;
+}
+
+.authSwitchLink a {
+  color: #1e40af;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.authSwitchLink a:hover {
+  text-decoration: underline;
+}

@@ -1,0 +1,499 @@
+/* ==================== Container כללי ==================== */
+.homeContainer {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  direction: rtl;
+  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 100%);
+  min-height: 100vh;
+}
+
+/* ==================== Hero Section ==================== */
+.heroSection {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: white;
+  padding: clamp(40px, 8vw, 80px) clamp(16px, 4vw, 24px) clamp(30px, 6vw, 60px);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.heroSection::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+  background-size: cover;
+  opacity: 0.3;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 clamp(16px, 4vw, 24px);
+}
+
+.heroTitle {
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  font-weight: 800;
+  margin: 0 0 16px 0;
+  line-height: 1.2;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  margin: 0 0 32px 0;
+  opacity: 0.95;
+  line-height: 1.6;
+}
+
+.welcomeMessage {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  padding: 16px 24px;
+  border-radius: 12px;
+  margin: 0 auto 32px;
+  max-width: 400px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.welcomeMessage p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* ==================== Search Form ==================== */
+.searchForm {
+  display: flex;
+  gap: 12px;
+  max-width: min(600px, 90vw);
+  margin: 0 auto clamp(20px, 4vw, 40px);
+  background: white;
+  padding: 8px;
+  border-radius: 50px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  width: 100%;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  padding: 14px 24px;
+  font-size: 1rem;
+  border-radius: 50px;
+  outline: none;
+  background: transparent;
+  color: #1f2937;
+}
+
+.searchInput::placeholder {
+  color: #9ca3af;
+}
+
+.searchButton {
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-size: 1rem;
+}
+
+.searchButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* ==================== Hero Stats ==================== */
+.heroStats {
+  display: flex;
+  justify-content: center;
+  gap: clamp(24px, 5vw, 48px);
+  flex-wrap: wrap;
+  margin-top: clamp(20px, 4vw, 40px);
+}
+
+.heroStat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.heroStatNumber {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.heroStatLabel {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* ==================== Featured Section ==================== */
+.featuredSection {
+  padding: clamp(40px, 8vw, 80px) clamp(16px, 4vw, 24px);
+  width: 100%;
+  margin: 0;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 48px;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 clamp(16px, 4vw, 24px);
+}
+
+.sectionTitle {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 12px 0;
+}
+
+.sectionSubtitle {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* ==================== Property Grid ==================== */
+.propertyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: clamp(20px, 3vw, 32px);
+  margin-bottom: clamp(24px, 4vw, 48px);
+  max-width: 1600px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 clamp(16px, 4vw, 24px);
+  width: 100%;
+  align-items: stretch;
+}
+
+.viewAllContainer {
+  text-align: center;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 clamp(16px, 4vw, 24px);
+}
+
+.viewAllButton {
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  color: white;
+  border: none;
+  padding: 16px 48px;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.viewAllButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* ==================== Quick Actions Section ==================== */
+.quickActionsSection {
+  padding: clamp(40px, 8vw, 80px) clamp(16px, 4vw, 24px);
+  background: #f8fafc;
+  width: 100%;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: clamp(20px, 3vw, 32px);
+  width: 100%;
+  margin: 0;
+  padding: 0 clamp(16px, 4vw, 24px);
+}
+
+.featureCard {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.featureCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #1e40af);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.featureCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.2);
+  border-color: #3b82f6;
+}
+
+.featureCard:hover::before {
+  transform: scaleX(1);
+}
+
+.featureIcon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.featureCard:hover .featureIcon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.featureCard h3 {
+  color: #1f2937;
+  margin: 0 0 12px 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.featureCard p {
+  color: #6b7280;
+  margin: 0 0 16px 0;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.cardAction {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e40af;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.featureCardLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ==================== Call to Action ==================== */
+.callToAction {
+  padding: clamp(40px, 8vw, 80px) clamp(16px, 4vw, 24px);
+  width: 100%;
+  margin: 0;
+}
+
+.ctaCard {
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+  color: white;
+  padding: clamp(40px, 6vw, 64px) clamp(24px, 4vw, 40px);
+  max-width: 1400px;
+  margin: 0 auto;
+  text-align: center;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(59, 130, 246, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.ctaCard::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.ctaCard h3 {
+  font-size: 2.5rem;
+  margin: 0 0 16px 0;
+  font-weight: 800;
+  position: relative;
+  z-index: 1;
+}
+
+.ctaCard p {
+  margin: 0 0 32px 0;
+  opacity: 0.95;
+  font-size: 1.2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.ctaButtons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.ctaButton,
+.ctaButtonSecondary {
+  padding: 16px 40px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.ctaButton {
+  background: white;
+  color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.ctaButton:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.ctaButtonSecondary {
+  background: transparent;
+  color: white;
+  border: 3px solid white;
+}
+
+.ctaButtonSecondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+}
+
+
+
+/* ==================== Footer ==================== */
+.footer {
+  background: #1f2937;
+  color: #9ca3af;
+  text-align: center;
+  padding: 32px 24px;
+  margin-top: 80px;
+}
+
+.footer p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* ==================== Responsive ==================== */
+@media (max-width: 1024px) {
+  .propertyGrid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    gap: clamp(16px, 2.5vw, 24px);
+  }
+  
+  .features {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .homeContainer {
+    padding: 0;
+  }
+
+  .heroSection {
+    padding: clamp(40px, 8vw, 60px) clamp(16px, 4vw, 20px) clamp(30px, 6vw, 40px);
+  }
+
+  .heroStats {
+    gap: clamp(20px, 4vw, 32px);
+  }
+
+  .searchForm {
+    flex-direction: column;
+    border-radius: 16px;
+    max-width: 100%;
+  }
+
+  .searchInput,
+  .searchButton {
+    border-radius: 12px;
+    width: 100%;
+  }
+
+  .featuredSection,
+  .quickActionsSection,
+  .callToAction,
+  .benefitsSection {
+    padding: clamp(40px, 8vw, 60px) clamp(16px, 4vw, 20px);
+  }
+
+  .propertyGrid {
+    grid-template-columns: 1fr;
+    gap: clamp(16px, 3vw, 20px);
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+    gap: clamp(16px, 3vw, 24px);
+  }
+
+  .ctaCard {
+    padding: clamp(32px, 6vw, 48px) clamp(16px, 4vw, 24px);
+  }
+
+  .ctaButtons {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroStats {
+    gap: 20px;
+  }
+
+  .featureCard {
+    padding: clamp(16px, 4vw, 24px);
+  }
+
+  .featureIcon {
+    font-size: clamp(2rem, 5vw, 2.5rem);
+  }
+
+  .viewAllButton {
+    width: 100%;
+    padding: 14px 24px;
+    font-size: 1rem;
+  }
+}
