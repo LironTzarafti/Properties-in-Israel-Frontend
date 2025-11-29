@@ -89,7 +89,7 @@ function Settings() {
       localStorage.clear();
       
       // ניווט מיידי לדף הבית
-      window.location.href = "/login";
+       navigate("/login");
       
     } catch (error) {
       console.error("Error deleting account:", error);
