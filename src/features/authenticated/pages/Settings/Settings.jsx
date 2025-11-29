@@ -203,14 +203,14 @@ function Settings() {
 
           <button
             className={styles.linkButton}
-            onClick={handleDeleteAccount}
-            disabled={isDeleting}
-          >
-            <span style={{ color: "#dc2626" }}>
-              {isDeleting ? "מוחק..." : "מחק חשבון"}
-            </span>
-            <span>→</span>
-          </button>
+             onClick={handleDeleteAccount}
+               disabled={isDeleting}
+               >
+              <span style={{ color: "#dc2626" }}>
+               {isDeleting ? t("Deleting...") : t("Delete account")}
+               </span>
+              <span>→</span>
+              </button>
         </section>
 
         <div className={styles.saveSection}>

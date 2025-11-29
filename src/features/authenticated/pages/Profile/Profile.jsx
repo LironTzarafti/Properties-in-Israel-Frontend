@@ -5,8 +5,10 @@ import { updateUserProfile } from "../../../../store/userSlice";
 import { toast } from "react-toastify";
 import styles from "./Profile.module.css";
 import { sortedCities as israelCities } from "../../../../utils/israelCities";
+import { useTranslation } from "react-i18next";
 
 function Profile() {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const currentUser = useSelector((state) => state.user.currentUser);

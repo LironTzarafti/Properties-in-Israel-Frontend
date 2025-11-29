@@ -235,11 +235,11 @@ function PropertyCard({ property, onEdit, currentUser, isFavorite = false, showE
           </div>
         ) : property.phone && !showPhoneDirectly ? (
           <button 
-            className={styles.showPhoneBtn} 
+           className={styles.showPhoneBtn}
             onClick={() => setShowPhonePopup(true)}
-          >
-            📞 הצג מספר טלפון
-          </button>
+             >
+            {t("Show phone number")} 📞
+             </button>
         ) : null}
 
         {currentUser && showEditButtons ? (
