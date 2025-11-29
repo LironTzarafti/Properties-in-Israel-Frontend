@@ -192,7 +192,7 @@ function Profile() {
             className={styles.editBtn}
             onClick={() => setIsEditing(true)}
           >
-            ✏️ {t("Edit profile")}
+            ✏️ {t ? t("Edit profile") : "Edit profile"}
           </button>
           )}
         </div>
