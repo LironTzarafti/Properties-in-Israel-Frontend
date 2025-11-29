@@ -42,12 +42,12 @@ function Settings() {
     loadSettings();
   }, []); // ריק לגמרי - רק בטעינה ראשונית
 
+  // 🆕 רק עדכון state, ללא שינוי מיידי של השפה
   const handleLanguageChange = (lng) => {
     setLanguage(lng);
-    i18n.changeLanguage(lng);
   };
 
-  // שמירת הגדרות
+  // 🆕 שמירת הגדרות - כאן משתנה השפה!
   const handleSave = () => {
     const settings = {
       notifications,
@@ -55,6 +55,9 @@ function Settings() {
       language,
     };
     localStorage.setItem("userSettings", JSON.stringify(settings));
+    
+    i18n.changeLanguage(language);
+    
     alert(t("Settings saved!"));
   };
 
@@ -63,7 +66,7 @@ function Settings() {
   const openModal = (content) => setModalContent(content);
   const closeModal = () => setModalContent(null);
 
-  // 🆕 פונקציית מחיקת חשבון
+  // פונקציית מחיקת חשבון
   const handleDeleteAccount = async () => {
     const firstConfirm = window.confirm(
       "האם אתה בטוח שברצונך למחוק את החשבון? פעולה זו לא ניתנת לביטול!"
@@ -89,7 +92,7 @@ function Settings() {
       localStorage.clear();
       
       // ניווט לדף הבית
-    navigate("/", { replace: true });
+      navigate("/", { replace: true });
       
     } catch (error) {
       console.error("Error deleting account:", error);

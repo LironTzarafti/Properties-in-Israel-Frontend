@@ -247,17 +247,17 @@ function PropertyCard({ property, onEdit, currentUser, isFavorite = false, showE
             {/* כפתורי ערוך/מחק קטנים */}
             {isOwner && (
               <div className={styles.ownerActions}>
-                <button onClick={() => onEdit(property)} className={styles.editBtn}>
-                  ✏️ ערוך
-                </button>
-                <button 
-                  onClick={handleDelete} 
-                  className={styles.deleteBtn}
-                  disabled={isDeleting}
-                >
-                  🗑️ {isDeleting ? "מוחק..." : "מחק"}
-                </button>
-              </div>
+              <button onClick={() => onEdit(property)} className={styles.editBtn}>
+                ✏️ {t("Edit")}
+              </button>
+              <button 
+                onClick={handleDelete} 
+                className={styles.deleteBtn}
+                disabled={isDeleting}
+              >
+                🗑️ {isDeleting ? t("Deleting...") : t("Delete")}
+              </button>
+            </div>
             )}
           </div>
         ) : null}

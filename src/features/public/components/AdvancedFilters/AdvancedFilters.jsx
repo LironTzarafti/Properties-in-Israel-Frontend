@@ -166,12 +166,12 @@ function AdvancedFilters({ onFiltersChange, propertiesCount }) {
         </div>
 
         <button
-          className={styles.advancedToggle}
-          onClick={() => setShowAdvanced(!showAdvanced)}
-        >
-          {showAdvanced ? "▲ סגור" : "▼ מתקדם"}
-        </button>
-      </div>
+         className={styles.advancedToggle}
+            onClick={() => setShowAdvanced(!showAdvanced)}
+             >
+            {showAdvanced ? `▲ ${t("Close")}` : `▼ ${t("Advanced")}`}
+             </button>
+           </div>
 
       {/* פילטרים מתקדמים */}
       {showAdvanced && (
@@ -332,8 +332,8 @@ function AdvancedFilters({ onFiltersChange, propertiesCount }) {
         </select>
 
         <button onClick={handleReset} className={styles.resetButton}>
-          🔄 נקה פילטרים
-        </button>
+           🔄 {t("Clear filters")}
+         </button>
       </div>
     </div>
   );

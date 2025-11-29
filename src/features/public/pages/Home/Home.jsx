@@ -210,30 +210,30 @@ function Home() {
       {/* שאר תוכן הבית */}
       <section className={styles.heroSection}>
         <div className={styles.heroContent}>
-          <h1 className={styles.heroTitle}>
-            ברוכים הבאים לאפליקציית ניהול נדל"ן
-          </h1>
-          <p className={styles.heroSubtitle}>
-            נהל נכסים, בדוק סטטוסים והשתמש במחשבוני הלוואות.
-          </p>
+        <h1 className={styles.heroTitle}>
+           {t("Welcome to Real Estate Management App")}
+           </h1>
+            <p className={styles.heroSubtitle}>
+            {t("Manage properties, check statuses and use loan calculators.")}
+           </p>
 
           {currentUser && (
-            <div className={styles.welcomeMessage}>
-              <p>שלום {currentUser.name}! 👋</p>
-            </div>
-          )}
+             <div className={styles.welcomeMessage}>
+             <p>{t("Hello")} {currentUser.name}! 👋</p>
+              </div>
+                )}
 
           <form className={styles.searchForm} onSubmit={handleQuickSearch}>
-            <input
-              type="text"
-              placeholder="חפש לפי עיר, סוג נכס או תיאור..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={styles.searchInput}
-            />
-            <button type="submit" className={styles.searchButton}>
-              🔍 חפש
-            </button>
+          <input
+            type="text"
+              placeholder={t("Search by city, property type or description...")}
+                value={searchTerm}
+                 onChange={(e) => setSearchTerm(e.target.value)}
+                 className={styles.searchInput}
+                    />
+               <button type="submit" className={styles.searchButton}>
+               🔍 {t("Search")}
+               </button>
           </form>
         </div>
       </section>
@@ -242,7 +242,7 @@ function Home() {
       {isLoading ? (
         <section className={styles.featuredSection}>
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>🔥 נכסים מומלצים</h2>
+          <h2 className={styles.sectionTitle}>🔥 {t("Featured Properties")}</h2>
             <p className={styles.sectionSubtitle}>טוען נכסים...</p>
           </div>
         </section>
@@ -269,7 +269,7 @@ function Home() {
 
           <div className={styles.viewAllContainer}>
             <button onClick={handleAllProperties} className={styles.viewAllButton}>
-              צפה בכל הנכסים →
+            {t("View all properties")} →
             </button>
           </div>
         </section>

@@ -33,7 +33,7 @@ function Profile() {
     propertyUpdates: true,
   });
   
-  const propertyTypes = ["דירה","וילה","קוטג'", "בית", "נטהאוז", "דופלקס", "משרד", "מגרש", "חנות"];
+  const propertyTypes = ["דירה","וילה","קוטג'", "בית", "פנטהאוז", "דופלקס", "משרד", "מגרש", "חנות"];
 
   // בדיקה אם המשתמש מחובר
   useEffect(() => {
@@ -187,11 +187,11 @@ function Profile() {
           <h1>הפרופיל שלי</h1>
           {!isEditing && (
             <button
-              className={styles.editBtn}
-              onClick={() => setIsEditing(true)}
-            >
-              ✏️ ערוך פרופיל
-            </button>
+            className={styles.editBtn}
+            onClick={() => setIsEditing(true)}
+          >
+            ✏️ {t("Edit profile")}
+          </button>
           )}
         </div>
 

@@ -192,7 +192,7 @@ function PropertyForm({ property, onClose, currentUser }) {
   if (!currentUser) return null;
 
     
-  const propertyTypes = ["דירה","וילה","קוטג'", "בית", "נטהאוז", "דופלקס", "משרד", "מגרש", "חנות"];
+  const propertyTypes = ["דירה","וילה","קוטג'", "בית", "פנטאהוז", "דופלקס", "משרד", "מגרש", "חנות"];
 
   return (
     <div className={styles.formOverlay}>
@@ -305,23 +305,25 @@ function PropertyForm({ property, onClose, currentUser }) {
         </div>
 
         <label className={styles.checkboxLabel}>
-          <input
+         <input
             type="checkbox"
             checked={formData.isPublic}
             onChange={(e) => handleChange("isPublic", e.target.checked)}
-          />
-          הצג נכס זה לכל המשתמשים (ציבורי)
-        </label>
+              />
+               {t("Show this property to all users (public)")}
+             </label>
 
-        <div className={styles.actions}>
-          <button type="submit" disabled={isLoading}>
-            {isLoading ? "שומר..." : (property ? "שמור" : "הוסף")}
-          </button>
-          <button type="button" onClick={onClose} disabled={isLoading}>ביטול</button>
-        </div>
-      </form>
-    </div>
-  );
-}
+             <div className={styles.actions}>
+              <button type="submit" disabled={isLoading}>
+                {isLoading ? t("Saving...") : (property ? t("Save") : t("Add"))}
+                </button>
+                 <button type="button" onClick={onClose} disabled={isLoading}>
+                   {t("Cancel")}
+                </button>
+                 </div>
+             </form>
+          </div>
+         );
+       }
 
 export default PropertyForm;
