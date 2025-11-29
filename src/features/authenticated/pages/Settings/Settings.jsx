@@ -88,8 +88,8 @@ function Settings() {
       // מחיקה מיידית של כל הנתונים המקומיים
       localStorage.clear();
       
-      // ניווט מיידי לדף הבית
-       navigate("/login");
+      // ניווט לדף הבית
+    navigate("/", { replace: true });
       
     } catch (error) {
       console.error("Error deleting account:", error);
