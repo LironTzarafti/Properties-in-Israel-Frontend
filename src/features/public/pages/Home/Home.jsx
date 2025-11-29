@@ -211,7 +211,7 @@ function Home() {
       <section className={styles.heroSection}>
         <div className={styles.heroContent}>
         <h1 className={styles.heroTitle}>
-           {t("Welcome to Real Estate Management App")}
+           {t("Welcome to Properties Management App")}
            </h1>
             <p className={styles.heroSubtitle}>
             {t("Manage properties, check statuses and use loan calculators.")}

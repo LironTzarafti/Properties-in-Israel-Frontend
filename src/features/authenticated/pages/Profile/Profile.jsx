@@ -447,17 +447,17 @@ function Profile() {
 
               {isEditing && (
                 <div className={styles.formActions}>
-                  <button type="submit" className={styles.saveBtn}>
-                    💾 שמור שינויים
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.cancelBtn}
-                    onClick={handleCancel}
-                  >
-                    ✕ ביטול
-                  </button>
-                </div>
+                <button type="submit" className={styles.saveBtn}>
+                  💾 {t("Save changes")}
+                </button>
+                <button
+                  type="button"
+                  className={styles.cancelBtn}
+                  onClick={handleCancel}
+                >
+                  ✕ {t("Cancel")}
+                </button>
+              </div>
               )}
             </form>
           </div>
