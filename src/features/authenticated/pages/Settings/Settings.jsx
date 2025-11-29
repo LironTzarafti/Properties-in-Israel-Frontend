@@ -10,7 +10,7 @@ function Settings() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const currentUser = useSelector(state => state.user.currentUser);
+  const user = useSelector((state) => state.user.currentUser); // מזהה המשתמש
 
   const [notifications, setNotifications] = useState(true);
   const [emailUpdates, setEmailUpdates] = useState(true);
@@ -18,46 +18,61 @@ function Settings() {
   const [modalContent, setModalContent] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // מפתח שמירה ב-localStorage לפי המשתמש
-  const userId = currentUser?.id || "guest";
-  const storageKey = `userSettings_${userId}`;
-
-  // טעינת הגדרות רק בהתחלה
   useEffect(() => {
-    const savedSettings = localStorage.getItem(storageKey);
-    if (savedSettings) {
-      try {
-        const parsed = JSON.parse(savedSettings);
-        setNotifications(parsed.notifications ?? true);
-        setEmailUpdates(parsed.emailUpdates ?? true);
-        setLanguage(parsed.language || "he");
-      } catch (error) {
-        console.error("Error loading settings:", error);
+    const loadSettings = () => {
+      if (!user) {
+        // אורח – תמיד דיפולט
+        setLanguage("he");
+        i18n.changeLanguage("he");
+        return;
       }
-    } else {
-      // אם אין הגדרות, תמיד דיפולט עברית
-      setLanguage("he");
-      i18n.changeLanguage("he");
-    }
-  }, [storageKey, i18n]);
+
+      const savedSettings = localStorage.getItem(`userSettings_${user.id}`);
+      if (savedSettings) {
+        try {
+          const parsed = JSON.parse(savedSettings);
+          setNotifications(parsed.notifications ?? true);
+          setEmailUpdates(parsed.emailUpdates ?? true);
+          setLanguage(parsed.language || "he");
+
+          if (i18n.language !== (parsed.language || "he")) {
+            i18n.changeLanguage(parsed.language || "he");
+          }
+        } catch (error) {
+          console.error("Error loading settings:", error);
+        }
+      } else {
+        // אם אין הגדרות נשמרות למשתמש, דיפולט
+        setLanguage("he");
+        i18n.changeLanguage("he");
+      }
+    };
+
+    loadSettings();
+  }, [user, i18n]);
 
   const handleLanguageChange = (lng) => {
-    setLanguage(lng); // משנה רק את state, לא את השפה מיד
+    setLanguage(lng);
   };
 
   const handleSave = () => {
+    if (!user) {
+      alert(t("You must be logged in to save settings."));
+      return;
+    }
+
     const settings = {
       notifications,
       emailUpdates,
       language,
     };
-    localStorage.setItem(storageKey, JSON.stringify(settings));
-    i18n.changeLanguage(language); // עכשיו השפה משתנה בפועל
+
+    localStorage.setItem(`userSettings_${user.id}`, JSON.stringify(settings));
+    i18n.changeLanguage(language);
     alert(t("Settings saved!"));
   };
 
   const handleBack = () => window.history.back();
-
   const openModal = (content) => setModalContent(content);
   const closeModal = () => setModalContent(null);
 
@@ -76,8 +91,7 @@ function Settings() {
     try {
       await deleteAccount();
       dispatch(logout());
-      // מחיקת כל הגדרות המשתמש מה-localStorage
-      localStorage.removeItem(storageKey);
+      localStorage.clear();
       navigate("/", { replace: true });
     } catch (error) {
       console.error("Error deleting account:", error);
@@ -87,17 +101,17 @@ function Settings() {
   };
 
   const defaultPrivacyText = `
-מדיניות פרטיות - ניהול נכסים:
-אנו אוספים מידע אודות הנכסים, משתמשים ופעולות באפליקציה על מנת לייעל את הניהול, להבטיח אבטחה ולשפר את חוויית המשתמש.
-כל המידע נשמר בצורה מוצפנת ואינו מועבר לצד שלישי ללא הסכמה.
-`;
+  מדיניות פרטיות - ניהול נכסים:
+  אנו אוספים מידע אודות הנכסים, משתמשים ופעולות באפליקציה על מנת לייעל את הניהול, להבטיח אבטחה ולשפר את חוויית המשתמש.
+  כל המידע נשמר בצורה מוצפנת ואינו מועבר לצד שלישי ללא הסכמה.
+  `;
 
   const defaultTermsText = `
-תנאי שימוש:
-השימוש באפליקציה מותנה בקבלת התנאים המפורטים כאן. 
-המשתמש מתחייב להשתמש במידע שנאסף אך ורק לניהול הנכסים האישיים שלו. 
-אין לבצע פעולות מזיקות או שיתוף מידע לצדדים שאינם מורשים.
-`;
+  תנאי שימוש:
+  השימוש באפליקציה מותנה בקבלת התנאים המפורטים כאן. 
+  המשתמש מתחייב להשתמש במידע שנאסף אך ורק לניהול הנכסים האישיים שלו. 
+  אין לבצע פעולות מזיקות או שיתוף מידע לצדדים שאינם מורשים.
+  `;
 
   return (
     <div className={styles.settingsContainer}>
@@ -113,7 +127,6 @@ function Settings() {
         {/* התראות */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>🔔 {t("Notifications")}</h2>
-
           <div className={styles.settingItem}>
             <div className={styles.settingInfo}>
               <label>{t("Browser notifications")}</label>
@@ -148,7 +161,6 @@ function Settings() {
         {/* שפה */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>🌐 {t("Language & Region")}</h2>
-
           <div className={styles.settingItem}>
             <div className={styles.settingInfo}>
               <label>{t("Interface language")}</label>
@@ -169,19 +181,12 @@ function Settings() {
         {/* פרטיות */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>🔒 {t("Privacy & Security")}</h2>
-
-          <button 
-            className={styles.linkButton} 
-            onClick={() => openModal(defaultPrivacyText)}
-          >
+          <button className={styles.linkButton} onClick={() => openModal(defaultPrivacyText)}>
             <span>{t("Privacy Policy")}</span>
             <span>→</span>
           </button>
 
-          <button 
-            className={styles.linkButton} 
-            onClick={() => openModal(defaultTermsText)}
-          >
+          <button className={styles.linkButton} onClick={() => openModal(defaultTermsText)}>
             <span>{t("Terms of Use")}</span>
             <span>→</span>
           </button>
