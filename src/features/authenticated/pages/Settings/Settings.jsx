@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { logout } from "../../../../store/userSlice";
 import { deleteAccount } from "../../../../services/api";
 import styles from "./Settings.module.css";
@@ -10,7 +10,6 @@ function Settings() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.currentUser); // מזהה המשתמש
 
   const [notifications, setNotifications] = useState(true);
   const [emailUpdates, setEmailUpdates] = useState(true);
@@ -18,81 +17,83 @@ function Settings() {
   const [modalContent, setModalContent] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // טוען הגדרות פעם אחת בלבד
   useEffect(() => {
     const loadSettings = () => {
-      if (!user) {
-        // אורח – תמיד דיפולט
-        setLanguage("he");
-        i18n.changeLanguage("he");
-        return;
-      }
-
-      const savedSettings = localStorage.getItem(`userSettings_${user.id}`);
+      const savedSettings = localStorage.getItem("userSettings");
+      
       if (savedSettings) {
         try {
           const parsed = JSON.parse(savedSettings);
           setNotifications(parsed.notifications ?? true);
           setEmailUpdates(parsed.emailUpdates ?? true);
           setLanguage(parsed.language || "he");
-
+          
+          // שינוי שפה רק אם שונה מהנוכחית
           if (i18n.language !== (parsed.language || "he")) {
             i18n.changeLanguage(parsed.language || "he");
           }
         } catch (error) {
           console.error("Error loading settings:", error);
         }
-      } else {
-        // אם אין הגדרות נשמרות למשתמש, דיפולט
-        setLanguage("he");
-        i18n.changeLanguage("he");
       }
     };
-
+    
     loadSettings();
-  }, [user, i18n]);
+  }, []); // ריק לגמרי - רק בטעינה ראשונית
 
+  // 🆕 רק עדכון state, ללא שינוי מיידי של השפה
   const handleLanguageChange = (lng) => {
     setLanguage(lng);
   };
 
+  // 🆕 שמירת הגדרות - כאן משתנה השפה!
   const handleSave = () => {
-    if (!user) {
-      alert(t("You must be logged in to save settings."));
-      return;
-    }
-
     const settings = {
       notifications,
       emailUpdates,
       language,
     };
-
-    localStorage.setItem(`userSettings_${user.id}`, JSON.stringify(settings));
+    localStorage.setItem("userSettings", JSON.stringify(settings));
+    
     i18n.changeLanguage(language);
+    
     alert(t("Settings saved!"));
   };
 
   const handleBack = () => window.history.back();
+
   const openModal = (content) => setModalContent(content);
   const closeModal = () => setModalContent(null);
 
+  // פונקציית מחיקת חשבון
   const handleDeleteAccount = async () => {
     const firstConfirm = window.confirm(
       "האם אתה בטוח שברצונך למחוק את החשבון? פעולה זו לא ניתנת לביטול!"
     );
+    
     if (!firstConfirm) return;
 
     const secondConfirm = window.confirm(
       "אזהרה אחרונה! כל הנתונים שלך יימחקו לצמיתות. להמשיך?"
     );
+
     if (!secondConfirm) return;
 
     setIsDeleting(true);
+
     try {
       await deleteAccount();
+      
+      // ניקוי Redux Store - מנתק את המשתמש
       dispatch(logout());
+      
+      // מחיקה מיידית של כל הנתונים המקומיים
       localStorage.clear();
+      
+      // ניווט לדף הבית
       navigate("/", { replace: true });
+      
     } catch (error) {
       console.error("Error deleting account:", error);
       alert("שגיאה במחיקת החשבון: " + error.message);
@@ -127,6 +128,7 @@ function Settings() {
         {/* התראות */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>🔔 {t("Notifications")}</h2>
+
           <div className={styles.settingItem}>
             <div className={styles.settingInfo}>
               <label>{t("Browser notifications")}</label>
@@ -161,6 +163,7 @@ function Settings() {
         {/* שפה */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>🌐 {t("Language & Region")}</h2>
+
           <div className={styles.settingItem}>
             <div className={styles.settingInfo}>
               <label>{t("Interface language")}</label>
@@ -181,26 +184,33 @@ function Settings() {
         {/* פרטיות */}
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>🔒 {t("Privacy & Security")}</h2>
-          <button className={styles.linkButton} onClick={() => openModal(defaultPrivacyText)}>
+
+          <button 
+            className={styles.linkButton} 
+            onClick={() => openModal(defaultPrivacyText)}
+          >
             <span>{t("Privacy Policy")}</span>
             <span>→</span>
           </button>
 
-          <button className={styles.linkButton} onClick={() => openModal(defaultTermsText)}>
+          <button 
+            className={styles.linkButton} 
+            onClick={() => openModal(defaultTermsText)}
+          >
             <span>{t("Terms of Use")}</span>
             <span>→</span>
           </button>
 
           <button
             className={styles.linkButton}
-            onClick={handleDeleteAccount}
-            disabled={isDeleting}
-          >
-            <span style={{ color: "#dc2626" }}>
-              {isDeleting ? t("Deleting...") : t("Delete account")}
-            </span>
-            <span>→</span>
-          </button>
+             onClick={handleDeleteAccount}
+               disabled={isDeleting}
+               >
+              <span style={{ color: "#dc2626" }}>
+               {isDeleting ? t("Deleting...") : t("Delete account")}
+               </span>
+              <span>→</span>
+              </button>
         </section>
 
         <div className={styles.saveSection}>
