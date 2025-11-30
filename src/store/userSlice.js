@@ -25,6 +25,10 @@ export const userSlice = createSlice({
       state.currentUser = null;
       state.notifications = [];
       state.unreadCount = 0;
+       // איפוס השפה
+     if (typeof window !== 'undefined' && window.i18next) {
+      window.i18next.changeLanguage('he');
+     }
     },
     
     // עדכון פרטי משתמש

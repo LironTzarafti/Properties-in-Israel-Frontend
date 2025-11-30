@@ -34,7 +34,7 @@ const resources = {
       "Settings saved!": "Settings saved!",
       "Save Settings": "Save Settings",
       // Home page
-      "Welcome to Real Estate Management App": "Welcome to Real Estate Management App",
+      "Welcome to Properties Management App": "Welcome to Properties Management App",
       "Manage properties, check statuses and use loan calculators.": "Manage properties, check statuses and use loan calculators.",
       "Hello": "Hello",
       "All Properties": "All Properties",
@@ -109,6 +109,10 @@ const resources = {
       "Log out": "Log out",
       "Home": "Home",
       "You have been logged out successfully": "You have been logged out successfully",
+
+      //profile
+      "Save changes": "Save changes",
+
       // NotificationDropdown
       "Notifications": "Notifications",
       "Mark all as read": "Mark all as read",
@@ -181,7 +185,7 @@ const resources = {
       "Settings saved!": "ההגדרות נשמרו בהצלחה!",
       "Save Settings": "שמור הגדרות",
       // Home page
-      "Welcome to Real Estate Management App": "ברוכים הבאים לאפליקציית ניהול נדל\"ן",
+      "Welcome to Properties Management App": "ברוכים הבאים לאפליקציית ניהול נכסים",
       "Manage properties, check statuses and use loan calculators.": "נהל נכסים, בדוק סטטוסים והשתמש במחשבוני הלוואות.",
       "Hello": "שלום",
       "All Properties": "כל הנכסים",
@@ -256,6 +260,9 @@ const resources = {
       "Log out": "התנתק",
       "Home": "דף הבית",
       "You have been logged out successfully": "התנתקת בהצלחה",
+
+      //profile
+      "Save changes": "שמור שינויים",
       // NotificationDropdown
       "Notifications": "התראות",
       "Mark all as read": "סמן הכל כנקרא",
@@ -328,7 +335,7 @@ const resources = {
       "Settings saved!": "تم حفظ الإعدادات بنجاح!",
       "Save Settings": "حفظ الإعدادات",
       // Home page
-      "Welcome to Real Estate Management App": "مرحبًا بك في تطبيق إدارة العقارات",
+      "Welcome to Properties Management App": "مرحبًا بكم في تطبيق إدارة العقارات",
       "Manage properties, check statuses and use loan calculators.": "إدارة العقارات والتحقق من الحالات واستخدام حاسبات القروض.",
       "Hello": "مرحبا",
       "All Properties": "جميع العقارات",
@@ -427,6 +434,9 @@ const resources = {
       "Login to save favorites": "تسجيل الدخول لحفظ المفضلة",
       "Edit": "تعديل",
       "Show phone number": "عرض رقم الهاتف",
+
+      //profile
+      "Save changes": "حفظ التغييرات",
       // PropertyForm
       "Please log in to add a property": "يرجى تسجيل الدخول لإضافة عقار",
       "Please fill all fields": "يرجى ملء جميع الحقول",
@@ -445,13 +455,12 @@ const resources = {
   }
 };
 
-const savedLanguage = localStorage.getItem("language") || "he";
 
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: savedLanguage,
+    lng: "he", 
     fallbackLng: "he",
     interpolation: {
       escapeValue: false,
