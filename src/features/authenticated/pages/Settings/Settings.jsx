@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { logout } from "../../../../store/userSlice";
 import { deleteAccount } from "../../../../services/api";
 import styles from "./Settings.module.css";
@@ -10,10 +10,6 @@ function Settings() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
-  // קבלת המשתמש המחובר מה-Redux
-  const currentUser = useSelector((state) => state.user?.currentUser);
-  const userId = currentUser?.id || currentUser?.email || null;
 
   const [notifications, setNotifications] = useState(true);
   const [emailUpdates, setEmailUpdates] = useState(true);
@@ -21,24 +17,11 @@ function Settings() {
   const [modalContent, setModalContent] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // פונקציה לקבלת מפתח ייעודי למשתמש
-  const getUserSettingsKey = () => {
-    if (!userId) return null;
-    return `userSettings_${userId}`;
-  };
-
-  // טעינת הגדרות ספציפיות למשתמש בלבד
+  // טוען הגדרות פעם אחת בלבד
   useEffect(() => {
     const loadSettings = () => {
-      // אם אין משתמש מחובר - עברית דיפולט
-      if (!userId) {
-        setLanguage("he");
-        i18n.changeLanguage("he");
-        return;
-      }
-
-      const settingsKey = getUserSettingsKey();
-      const savedSettings = localStorage.getItem(settingsKey);
+      const savedSettings = localStorage.getItem("userSettings");
+      console.log(savedSettings)
       
       if (savedSettings) {
         try {
@@ -53,39 +36,26 @@ function Settings() {
           }
         } catch (error) {
           console.error("Error loading settings:", error);
-          // במקרה של שגיאה - חזרה לעברית
-          setLanguage("he");
-          i18n.changeLanguage("he");
         }
-      } else {
-        // אם אין הגדרות שמורות - עברית דיפולט
-        setLanguage("he");
-        i18n.changeLanguage("he");
       }
     };
     
     loadSettings();
-  }, [userId, i18n]);
+  }, []); // ריק לגמרי - רק בטעינה ראשונית
 
+  // 🆕 רק עדכון state, ללא שינוי מיידי של השפה
   const handleLanguageChange = (lng) => {
     setLanguage(lng);
   };
 
-  // שמירה ספציפית למשתמש
+  // 🆕 שמירת הגדרות - כאן משתנה השפה!
   const handleSave = () => {
-    if (!userId) {
-      alert(t("You must be logged in to save settings"));
-      return;
-    }
-
     const settings = {
       notifications,
       emailUpdates,
       language,
     };
-    
-    const settingsKey = getUserSettingsKey();
-    localStorage.setItem(settingsKey, JSON.stringify(settings));
+    localStorage.setItem("userSettings", JSON.stringify(settings));
     
     i18n.changeLanguage(language);
     
@@ -97,7 +67,7 @@ function Settings() {
   const openModal = (content) => setModalContent(content);
   const closeModal = () => setModalContent(null);
 
-  // מחיקת חשבון - מוחק רק את ההגדרות של המשתמש הנוכחי
+// מחיקת חשבון - מוחק רק את ההגדרות של המשתמש הנוכחי
   const handleDeleteAccount = async () => {
     const firstConfirm = window.confirm(
       t("Are you sure you want to delete your account? This action cannot be undone!")
@@ -116,24 +86,18 @@ function Settings() {
     try {
       await deleteAccount();
       
-      // מחיקת ההגדרות של המשתמש הספציפי בלבד
-      const settingsKey = getUserSettingsKey();
-      if (settingsKey) {
-        localStorage.removeItem(settingsKey);
-      }
-      
-      // ניקוי Redux Store
+      // ניקוי Redux Store - מנתק את המשתמש
       dispatch(logout());
       
-      // איפוס לשפה דיפולט
-      i18n.changeLanguage("he");
+      // מחיקה מיידית של כל הנתונים המקומיים
+      localStorage.clear();
       
       // ניווט לדף הבית
       navigate("/", { replace: true });
       
     } catch (error) {
       console.error("Error deleting account:", error);
-      alert(t("Error deleting account: ") + error.message);
+      alert("שגיאה במחיקת החשבון: " + error.message);
       setIsDeleting(false);
     }
   };
@@ -150,25 +114,6 @@ function Settings() {
   המשתמש מתחייב להשתמש במידע שנאסף אך ורק לניהול הנכסים האישיים שלו. 
   אין לבצע פעולות מזיקות או שיתוף מידע לצדדים שאינם מורשים.
   `;
-
-  // אם אין משתמש מחובר - הצג הודעה
-  if (!userId) {
-    return (
-      <div className={styles.settingsContainer}>
-        <div className={styles.header}>
-          <button className={styles.backBtn} onClick={handleBack}>
-            ← {t("Back")}
-          </button>
-          <h1>{t("Settings")}</h1>
-        </div>
-        <div className={styles.content}>
-          <p style={{ textAlign: "center", padding: "2rem" }}>
-            {t("Please log in to access settings")}
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={styles.settingsContainer}>
@@ -259,14 +204,14 @@ function Settings() {
 
           <button
             className={styles.linkButton}
-            onClick={handleDeleteAccount}
-            disabled={isDeleting}
-          >
-            <span style={{ color: "#dc2626" }}>
-              {isDeleting ? t("Deleting...") : t("Delete account")}
-            </span>
-            <span>→</span>
-          </button>
+             onClick={handleDeleteAccount}
+               disabled={isDeleting}
+               >
+              <span style={{ color: "#dc2626" }}>
+               {isDeleting ? t("Deleting...") : t("Delete account")}
+               </span>
+              <span>→</span>
+              </button>
         </section>
 
         <div className={styles.saveSection}>
