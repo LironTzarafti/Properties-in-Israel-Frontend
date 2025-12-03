@@ -305,11 +305,15 @@ export const toggleFavoriteAPI = async (propertyId) => {
 let notificationsRequestInProgress = false;
 let retryCount = 0;
 const MAX_RETRIES = 2;
+const POLLING_INTERVAL = 60000; // 60 שניות
 
+let pollingTimer = null;
+
+// פונקציה חכמה לטעינת התראות
 export const getNotifications = async () => {
   if (notificationsRequestInProgress) {
     console.log("⏳ [Notifications] בקשה כבר פעילה, מחכה להשלמתה");
-    return null;
+    return;
   }
 
   notificationsRequestInProgress = true;
@@ -322,54 +326,45 @@ export const getNotifications = async () => {
     });
 
     notificationsRequestInProgress = false;
-    retryCount = 0; // אפס את הספירה לאחר הצלחה
+    retryCount = 0;
     return response;
 
   } catch (error) {
     notificationsRequestInProgress = false;
 
-    // טיפול ב-429 – Too Many Requests
     if (error?.response?.status === 429 && retryCount < MAX_RETRIES) {
       retryCount++;
-      const waitTime = Math.pow(2, retryCount) * 1500; // exponential backoff 1.5s → 3s
+      const waitTime = Math.pow(2, retryCount) * 1000; // exponential backoff
       console.warn(`⚠️ [Notifications] 429 – מחכה ${waitTime / 1000} שניות לפני retry #${retryCount}`);
       await new Promise(resolve => setTimeout(resolve, waitTime));
       return getNotifications();
     }
 
-    // אם לא הצלחנו אחרי MAX_RETRIES או שגיאה אחרת
     console.error("❌ [Notifications] שגיאה בטעינת התראות:", error);
-    return null;
+    return null; // לא לזרוק שגיאה שתשבור את האפליקציה
   }
 };
 
-// ==========================
-// פונקציות נוספות
-// ==========================
+// פונקציה להפעלה של polling חכם
+export const startNotificationsPolling = () => {
+  if (pollingTimer) return; // אם כבר פועל – אל תפעיל שוב
 
-export const markNotificationAsRead = async (notificationId) => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/notifications/${notificationId}/read`, {
-    method: 'PUT',
-    credentials: 'include',
-    headers: getAuthHeaders()
-  });
+  pollingTimer = setInterval(async () => {
+    const data = await getNotifications();
+    if (data) {
+      console.log(`✅ [Notifications] התראות עודכנו: ${data.notifications?.length || 0}`);
+    }
+  }, POLLING_INTERVAL);
 };
 
-export const markAllNotificationsAsRead = async () => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/notifications/read-all`, {
-    method: 'PUT',
-    credentials: 'include',
-    headers: getAuthHeaders()
-  });
+// פונקציה לעצירת ה-polling
+export const stopNotificationsPolling = () => {
+  if (pollingTimer) {
+    clearInterval(pollingTimer);
+    pollingTimer = null;
+  }
 };
 
-export const deleteNotificationAPI = async (notificationId) => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/notifications/${notificationId}`, {
-    method: 'DELETE',
-    credentials: 'include',
-    headers: getAuthHeaders()
-  });
-};
 
 
 // ========================================
