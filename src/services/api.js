@@ -4,7 +4,59 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://properties-in-israel-backend.onrender.com/api';
 
+// ========================================
+// ✅ מערכת רענון אוטומטי של טוקן
+// ========================================
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+// פונקציה להוספת בקשות שמחכות לרענון
+const subscribeTokenRefresh = (callback) => {
+  refreshSubscribers.push(callback);
+};
+
+// פונקציה לעדכון כל הבקשות שחיכו עם הטוקן החדש
+const onTokenRefreshed = (newToken) => {
+  refreshSubscribers.forEach(callback => callback(newToken));
+  refreshSubscribers = [];
+};
+
+// פונקציה לרענון הטוקן
+const refreshAccessToken = async () => {
+  try {
+    console.log('🔄 [API] מנסה לרענן Access Token...');
+    
+    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include', // ✅ חשוב! שולח את הקוקי
+      headers: { 'Content-Type': 'application/json' }
+    });
+    
+    if (!response.ok) {
+      throw new Error('Refresh נכשל');
+    }
+    
+    const data = await response.json();
+    
+    if (data.token) {
+      localStorage.setItem('token', data.token);
+      console.log('✅ [API] Access Token רוענן בהצלחה');
+      return data.token;
+    }
+    
+    throw new Error('לא התקבל טוקן חדש');
+  } catch (error) {
+    console.error('❌ [API] שגיאה ברענון טוקן:', error);
+    // במקרה של כשלון - מנקים הכל ומנתקים
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+    throw error;
+  }
+};
+
+// ========================================
 // פונקציה עזר ליצירת headers עם token
+// ========================================
 const getAuthHeaders = () => {
   const token = localStorage.getItem('token');
   return {
@@ -13,15 +65,77 @@ const getAuthHeaders = () => {
   };
 };
 
-// פונקציה עזר לטיפול בתגובות
-const handleResponse = async (response) => {
-  const data = await response.json();
-  
-  if (!response.ok) {
-    throw new Error(data.message || 'שגיאה בשרת');
+// ========================================
+// ✅ פונקציה משופרת לטיפול בתגובות עם רענון אוטומטי
+// ========================================
+const handleResponse = async (response, originalRequest) => {
+  // אם הבקשה הצליחה - פשוט נחזיר את הנתונים
+  if (response.ok) {
+    return await response.json();
   }
   
-  return data;
+  // ✅ אם קיבלנו 401 (Unauthorized) - ננסה לרענן
+  if (response.status === 401 && originalRequest) {
+    console.warn('⚠️ [API] קיבלתי 401 - מנסה רענון אוטומטי...');
+    
+    // אם כבר יש תהליך רענון בעבודה - נמתין לו
+    if (isRefreshing) {
+      console.log('⏳ [API] כבר יש רענון בעבודה, ממתין...');
+      return new Promise((resolve) => {
+        subscribeTokenRefresh((newToken) => {
+          // לאחר הרענון - ננסה שוב את הבקשה המקורית
+          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+          resolve(fetch(originalRequest.url, originalRequest).then(r => r.json()));
+        });
+      });
+    }
+    
+    // אם זה הניסיון הראשון - נתחיל רענון
+    isRefreshing = true;
+    
+    try {
+      const newToken = await refreshAccessToken();
+      isRefreshing = false;
+      
+      // עדכון כל הבקשות שחיכו
+      onTokenRefreshed(newToken);
+      
+      // ניסיון חוזר של הבקשה המקורית
+      originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+      const retryResponse = await fetch(originalRequest.url, originalRequest);
+      return await retryResponse.json();
+      
+    } catch (refreshError) {
+      isRefreshing = false;
+      refreshSubscribers = [];
+      throw new Error('נדרשת התחברות מחדש');
+    }
+  }
+  
+  // שגיאות אחרות
+  const data = await response.json().catch(() => ({ message: 'שגיאה בשרת' }));
+  throw new Error(data.message || 'שגיאה בשרת');
+};
+
+// ========================================
+// ✅ פונקציה עזר לביצוע fetch עם טיפול חכם בשגיאות
+// ========================================
+const fetchWithAutoRefresh = async (url, options = {}) => {
+  const requestStartTime = Date.now();
+  
+  try {
+    const response = await fetch(url, options);
+    
+    // ✅ אם הבקשה לקחה יותר מ-5 שניות (השרת התעורר)
+    const requestDuration = Date.now() - requestStartTime;
+    if (requestDuration > 5000) {
+      console.log('☕ [API] הבקשה לקחה', Math.round(requestDuration / 1000), 'שניות - השרת התעורר');
+    }
+    
+    return await handleResponse(response, options);
+  } catch (error) {
+    throw error;
+  }
 };
 
 // ========================================
@@ -30,20 +144,17 @@ const handleResponse = async (response) => {
 
 /**
  * התחברות משתמש
- * @param {string} email 
- * @param {string} password 
- * @returns {Promise} { _id, name, email, role, token }
  */
 export const login = async (email, password) => {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
+    credentials: 'include', // ✅ חשוב! מקבל את הקוקי
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
   });
   
   const data = await handleResponse(response);
   
-  // שמירת ה-token ב-localStorage
   if (data.token) {
     localStorage.setItem('token', data.token);
   }
@@ -53,21 +164,17 @@ export const login = async (email, password) => {
 
 /**
  * הרשמת משתמש חדש
- * @param {string} name 
- * @param {string} email 
- * @param {string} password 
- * @returns {Promise} { _id, name, email, role, token }
  */
 export const register = async (name, email, password) => {
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: 'POST',
+    credentials: 'include', // ✅ חשוב! מקבל את הקוקי
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password })
   });
   
   const data = await handleResponse(response);
   
-  // שמירת ה-token ב-localStorage
   if (data.token) {
     localStorage.setItem('token', data.token);
   }
@@ -77,32 +184,36 @@ export const register = async (name, email, password) => {
 
 /**
  * קבלת פרטי המשתמש המחובר
- * @returns {Promise} { _id, name, email, role, ... }
  */
 export const getMe = async () => {
-  const response = await fetch(`${API_BASE_URL}/auth/me`, {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/auth/me`, {
     method: 'GET',
+    credentials: 'include',
     headers: getAuthHeaders()
   });
-  
-  return handleResponse(response);
 };
 
 /**
  * התנתקות
- * @returns {Promise} { message }
  */
 export const logout = async () => {
+  console.log("🔐 [API] מבצע logout בשרת...");
   try {
     const response = await fetch(`${API_BASE_URL}/auth/logout`, {
       method: 'POST',
+      credentials: 'include', // ✅ חשוב! מוחק את הקוקי
       headers: getAuthHeaders()
     });
     
-    await handleResponse(response);
+    const data = await handleResponse(response);
+    console.log("✅ [API] logout הושלם בשרת");
+    return data;
+  } catch (error) {
+    console.warn("⚠️ [API] שגיאה ב-logout בשרת:", error);
+    throw error;
   } finally {
-    // תמיד נמחק את ה-token גם אם יש שגיאה
     localStorage.removeItem('token');
+    console.log("🗑️ [API] Token נמחק מ-localStorage");
   }
 };
 
@@ -110,214 +221,133 @@ export const logout = async () => {
 // Properties API
 // ========================================
 
-/**
- * קבלת כל הנכסים הציבוריים (ללא authentication - לאורחים)
- * @returns {Promise} { count, properties: [...] }
- */
 export const getPublicProperties = async () => {
-  const response = await fetch(`${API_BASE_URL}/properties/public`, {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/properties/public`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' }
   });
-  
-  return handleResponse(response);
 };
 
-/**
- * קבלת כל הנכסים של המשתמש המחובר (דורש authentication)
- * @returns {Promise} { count, properties: [...] }
- */
 export const getProperties = async () => {
-  const response = await fetch(`${API_BASE_URL}/properties`, {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/properties`, {
     method: 'GET',
+    credentials: 'include',
     headers: getAuthHeaders()
   });
-  
-  return handleResponse(response);
 };
 
-/**
- * קבלת נכס בודד לפי ID
- * @param {string} id 
- * @returns {Promise} { _id, title, description, ... }
- */
 export const getPropertyById = async (id) => {
-  const response = await fetch(`${API_BASE_URL}/properties/${id}`, {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/properties/${id}`, {
     method: 'GET',
+    credentials: 'include',
     headers: getAuthHeaders()
   });
-  
-  return handleResponse(response);
 };
 
-/**
- * יצירת נכס חדש
- * @param {Object} propertyData - { title, description, price, location, status? }
- * @returns {Promise} { _id, title, description, ... }
- */
 export const createProperty = async (propertyData) => {
-  const response = await fetch(`${API_BASE_URL}/properties`, {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/properties`, {
     method: 'POST',
+    credentials: 'include',
     headers: getAuthHeaders(),
     body: JSON.stringify(propertyData)
   });
-  
-  return handleResponse(response);
 };
 
-/**
- * עדכון נכס
- * @param {string} id 
- * @param {Object} propertyData - שדות לעדכון
- * @returns {Promise} { _id, title, description, ... }
- */
 export const updateProperty = async (id, propertyData) => {
-  const response = await fetch(`${API_BASE_URL}/properties/${id}`, {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/properties/${id}`, {
     method: 'PUT',
+    credentials: 'include',
     headers: getAuthHeaders(),
     body: JSON.stringify(propertyData)
   });
-  
-  return handleResponse(response);
 };
 
-/**
- * מחיקת נכס
- * @param {string} id 
- * @returns {Promise} { message }
- */
 export const deleteProperty = async (id) => {
-  const response = await fetch(`${API_BASE_URL}/properties/${id}`, {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/properties/${id}`, {
     method: 'DELETE',
+    credentials: 'include',
     headers: getAuthHeaders()
   });
-  
-  return handleResponse(response);
 };
 
-/**
- * עדכון סטטוס נכס בלבד
- * @param {string} id 
- * @param {string} status - 'available' או 'sold'
- * @returns {Promise} { _id, status, ... }
- */
 export const updatePropertyStatus = async (id, status) => {
-  const response = await fetch(`${API_BASE_URL}/properties/${id}/status`, {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/properties/${id}/status`, {
     method: 'PATCH',
+    credentials: 'include',
     headers: getAuthHeaders(),
     body: JSON.stringify({ status })
   });
-  
-  return handleResponse(response);
 };
 
 // ========================================
 // Favorites API
 // ========================================
 
-/**
- * קבלת כל המועדפים של המשתמש
- * @returns {Promise} { favorites: [...], favoriteIds: [...] }
- */
 export const getFavorites = async () => {
-  const response = await fetch(`${API_BASE_URL}/favorites`, {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/favorites`, {
     method: 'GET',
+    credentials: 'include',
     headers: getAuthHeaders()
   });
-  
-  return handleResponse(response);
 };
 
-/**
- * הוספה/הסרה של נכס מהמועדפים (toggle)
- * @param {string} propertyId 
- * @returns {Promise} { message, favoriteIds, action }
- */
 export const toggleFavoriteAPI = async (propertyId) => {
-  const response = await fetch(`${API_BASE_URL}/favorites/${propertyId}`, {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/favorites/${propertyId}`, {
     method: 'POST',
+    credentials: 'include',
     headers: getAuthHeaders()
   });
-  
-  return handleResponse(response);
 };
 
 // ========================================
 // Notifications API
 // ========================================
 
-/**
- * קבלת כל ההתראות של המשתמש המחובר
- * @returns {Promise} { notifications: [...], unreadCount: number }
- */
 export const getNotifications = async () => {
-  const response = await fetch(`${API_BASE_URL}/notifications`, {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/notifications`, {
     method: 'GET',
+    credentials: 'include',
     headers: getAuthHeaders()
   });
-  
-  return handleResponse(response);
 };
 
-/**
- * סימון התראה כנקראה
- * @param {string} notificationId 
- * @returns {Promise} { _id, read, ... }
- */
 export const markNotificationAsRead = async (notificationId) => {
-  const response = await fetch(`${API_BASE_URL}/notifications/${notificationId}/read`, {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/notifications/${notificationId}/read`, {
     method: 'PUT',
+    credentials: 'include',
     headers: getAuthHeaders()
   });
-  
-  return handleResponse(response);
 };
 
-/**
- * סימון כל ההתראות כנקראו
- * @returns {Promise} { message }
- */
 export const markAllNotificationsAsRead = async () => {
-  const response = await fetch(`${API_BASE_URL}/notifications/read-all`, {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/notifications/read-all`, {
     method: 'PUT',
+    credentials: 'include',
     headers: getAuthHeaders()
   });
-  
-  return handleResponse(response);
 };
 
-/**
- * מחיקת התראה
- * @param {string} notificationId 
- * @returns {Promise} { message }
- */
 export const deleteNotificationAPI = async (notificationId) => {
-  const response = await fetch(`${API_BASE_URL}/notifications/${notificationId}`, {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/notifications/${notificationId}`, {
     method: 'DELETE',
+    credentials: 'include',
     headers: getAuthHeaders()
   });
-  
-  return handleResponse(response);
 };
 
 // ========================================
-// Users API - 🆕 מחיקת חשבון
+// Users API
 // ========================================
 
-/**
- * מחיקת חשבון המשתמש המחובר
- * @returns {Promise} { message }
- */
 export const deleteAccount = async () => {
-  // שימוש בנתיב auth/account במקום users/:id
   const response = await fetch(`${API_BASE_URL}/auth/account`, {
     method: 'DELETE',
+    credentials: 'include',
     headers: getAuthHeaders()
   });
   
   const data = await handleResponse(response);
   
-  // מחיקת כל הנתונים המקומיים
   localStorage.removeItem('token');
   localStorage.removeItem('userSettings');
   
@@ -328,18 +358,10 @@ export const deleteAccount = async () => {
 // Helper Functions
 // ========================================
 
-/**
- * בדיקה אם יש token שמור
- * @returns {boolean}
- */
 export const isAuthenticated = () => {
   return !!localStorage.getItem('token');
 };
 
-/**
- * קבלת ה-token השמור
- * @returns {string|null}
- */
 export const getToken = () => {
   return localStorage.getItem('token');
 };

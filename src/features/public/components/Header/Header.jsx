@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import { useIsMobile } from "../../../hooks/useIsMobile";
 import NotificationDropdown from "../NotificationDropdown/NotificationDropdown";
 import ProfileDropdown from "../ProfileDropdown/ProfileDropdown";
 import styles from "./Header.module.css";
@@ -10,12 +11,12 @@ function Header() {
   const currentUser = useSelector((state) => state.user.currentUser);
   const navigate = useNavigate();
   const location = useLocation();
+  const isMobile = useIsMobile(768);
 
   const handleBack = () => {
     navigate(-1);
   };
 
-  // הצגת כפתור חזור רק כאשר לא בדף הבית
   const showBackButton = location.pathname !== "/";
 
   return (
@@ -51,17 +52,21 @@ function Header() {
         )} */}
 
         <h1 className={styles.logo}>🏠 {t("Properties in Israel")}</h1>
-        <nav className={styles.navLinks}>
-          <Link to="/" className={styles.navLink}>
-            {t("Home")}
-          </Link>
-          <Link to="/dashboard" className={styles.navLink}>
-            {t("Dashboard")}
-          </Link>
-          <Link to="/loan-calculator" className={styles.navLink}>
-            {t("Loan Calculator")}
-          </Link>
-        </nav>
+        
+        {/* הצגת navLinks רק בדסקטופ או במובייל למשתמש מחובר */}
+        {(!isMobile || currentUser) && (
+          <nav className={styles.navLinks}>
+            <Link to="/" className={styles.navLink}>
+              {t("Home")}
+            </Link>
+            <Link to="/dashboard" className={styles.navLink}>
+              {t("Dashboard")}
+            </Link>
+            <Link to="/loan-calculator" className={styles.navLink}>
+              {t("Loan Calculator")}
+            </Link>
+          </nav>
+        )}
       </div>
     </header>
   );
