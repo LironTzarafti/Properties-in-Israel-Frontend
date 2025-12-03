@@ -299,9 +299,10 @@ export const toggleFavoriteAPI = async (propertyId) => {
   });
 };
 
-// ========================================
-// Notifications API
-// ========================================
+// ==========================
+// Notification Service
+// ==========================
+
 let notificationsRequestInProgress = false;
 let retryCount = 0;
 const MAX_RETRIES = 2;
@@ -313,7 +314,7 @@ let pollingTimer = null;
 export const getNotifications = async () => {
   if (notificationsRequestInProgress) {
     console.log("⏳ [Notifications] בקשה כבר פעילה, מחכה להשלמתה");
-    return;
+    return null;
   }
 
   notificationsRequestInProgress = true;
@@ -326,20 +327,22 @@ export const getNotifications = async () => {
     });
 
     notificationsRequestInProgress = false;
-    retryCount = 0;
+    retryCount = 0; // אפס את הספירה לאחר הצלחה
     return response;
 
   } catch (error) {
     notificationsRequestInProgress = false;
 
+    // טיפול ב-429 – Too Many Requests
     if (error?.response?.status === 429 && retryCount < MAX_RETRIES) {
       retryCount++;
-      const waitTime = Math.pow(2, retryCount) * 1000; // exponential backoff
+      const waitTime = Math.pow(2, retryCount) * 1000; // exponential backoff: 1s, 2s
       console.warn(`⚠️ [Notifications] 429 – מחכה ${waitTime / 1000} שניות לפני retry #${retryCount}`);
       await new Promise(resolve => setTimeout(resolve, waitTime));
       return getNotifications();
     }
 
+    // אם לא הצלחנו אחרי MAX_RETRIES או שגיאה אחרת
     console.error("❌ [Notifications] שגיאה בטעינת התראות:", error);
     return null; // לא לזרוק שגיאה שתשבור את האפליקציה
   }
@@ -364,6 +367,35 @@ export const stopNotificationsPolling = () => {
     pollingTimer = null;
   }
 };
+
+// ==========================
+// פונקציות נוספות לניהול התראות
+// ==========================
+
+export const markNotificationAsRead = async (notificationId) => {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/notifications/${notificationId}/read`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: getAuthHeaders()
+  });
+};
+
+export const markAllNotificationsAsRead = async () => {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/notifications/read-all`, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: getAuthHeaders()
+  });
+};
+
+export const deleteNotificationAPI = async (notificationId) => {
+  return fetchWithAutoRefresh(`${API_BASE_URL}/notifications/${notificationId}`, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: getAuthHeaders()
+  });
+};
+
 
 
 
