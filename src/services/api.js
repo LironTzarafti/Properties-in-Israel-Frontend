@@ -302,15 +302,14 @@ export const toggleFavoriteAPI = async (propertyId) => {
 // ========================================
 // Notifications API
 // ========================================
-
 let notificationsRequestInProgress = false;
 let retryCount = 0;
-const MAX_RETRIES = 5;
+const MAX_RETRIES = 2;
 
 export const getNotifications = async () => {
   if (notificationsRequestInProgress) {
     console.log("⏳ [Notifications] בקשה כבר פעילה, מחכה להשלמתה");
-    return;
+    return null;
   }
 
   notificationsRequestInProgress = true;
@@ -329,20 +328,24 @@ export const getNotifications = async () => {
   } catch (error) {
     notificationsRequestInProgress = false;
 
-    // אם קיבלנו 429 – Too Many Requests
+    // טיפול ב-429 – Too Many Requests
     if (error?.response?.status === 429 && retryCount < MAX_RETRIES) {
       retryCount++;
-      const waitTime = Math.pow(2, retryCount) * 1000; // exponential backoff
+      const waitTime = Math.pow(2, retryCount) * 1500; // exponential backoff 1.5s → 3s
       console.warn(`⚠️ [Notifications] 429 – מחכה ${waitTime / 1000} שניות לפני retry #${retryCount}`);
       await new Promise(resolve => setTimeout(resolve, waitTime));
       return getNotifications();
     }
 
+    // אם לא הצלחנו אחרי MAX_RETRIES או שגיאה אחרת
     console.error("❌ [Notifications] שגיאה בטעינת התראות:", error);
-    throw error;
+    return null;
   }
 };
 
+// ==========================
+// פונקציות נוספות
+// ==========================
 
 export const markNotificationAsRead = async (notificationId) => {
   return fetchWithAutoRefresh(`${API_BASE_URL}/notifications/${notificationId}/read`, {
@@ -367,6 +370,7 @@ export const deleteNotificationAPI = async (notificationId) => {
     headers: getAuthHeaders()
   });
 };
+
 
 // ========================================
 // Users API
