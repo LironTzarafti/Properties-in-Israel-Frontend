@@ -303,13 +303,46 @@ export const toggleFavoriteAPI = async (propertyId) => {
 // Notifications API
 // ========================================
 
+let notificationsRequestInProgress = false;
+let retryCount = 0;
+const MAX_RETRIES = 5;
+
 export const getNotifications = async () => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/notifications`, {
-    method: 'GET',
-    credentials: 'include',
-    headers: getAuthHeaders()
-  });
+  if (notificationsRequestInProgress) {
+    console.log("⏳ [Notifications] בקשה כבר פעילה, מחכה להשלמתה");
+    return;
+  }
+
+  notificationsRequestInProgress = true;
+
+  try {
+    const response = await fetchWithAutoRefresh(`${API_BASE_URL}/notifications`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: getAuthHeaders(),
+    });
+
+    notificationsRequestInProgress = false;
+    retryCount = 0; // אפס את הספירה לאחר הצלחה
+    return response;
+
+  } catch (error) {
+    notificationsRequestInProgress = false;
+
+    // אם קיבלנו 429 – Too Many Requests
+    if (error?.response?.status === 429 && retryCount < MAX_RETRIES) {
+      retryCount++;
+      const waitTime = Math.pow(2, retryCount) * 1000; // exponential backoff
+      console.warn(`⚠️ [Notifications] 429 – מחכה ${waitTime / 1000} שניות לפני retry #${retryCount}`);
+      await new Promise(resolve => setTimeout(resolve, waitTime));
+      return getNotifications();
+    }
+
+    console.error("❌ [Notifications] שגיאה בטעינת התראות:", error);
+    throw error;
+  }
 };
+
 
 export const markNotificationAsRead = async (notificationId) => {
   return fetchWithAutoRefresh(`${API_BASE_URL}/notifications/${notificationId}/read`, {
