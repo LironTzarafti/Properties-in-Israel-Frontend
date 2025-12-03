@@ -81,8 +81,12 @@ export const userSlice = createSlice({
     
     // טעינת התראות מהשרת
     setNotifications: (state, action) => {
-      // action.payload צריך להיות { notifications: [...], unreadCount: number }
-      state.notifications = action.payload.notifications.map(n => ({
+      const payload = action.payload || {};
+    
+      // הגנה במקרה שהשרת החזיר null או שאין notifications
+      const notificationsArray = payload.notifications || [];
+    
+      state.notifications = notificationsArray.map(n => ({
         _id: n._id,
         id: n._id, // גם id וגם _id לתאימות
         type: n.type,
@@ -92,7 +96,8 @@ export const userSlice = createSlice({
         timestamp: n.createdAt || n.timestamp,
         property: n.property
       }));
-      state.unreadCount = action.payload.unreadCount || 0;
+    
+      state.unreadCount = payload.unreadCount || 0;
     },
     
     // עדכון התראה בודדת (לאחר סימון כנקראה)
