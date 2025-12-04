@@ -118,9 +118,6 @@ function Settings() {
   return (
     <div className={styles.settingsContainer}>
       <div className={styles.header}>
-        <button className={styles.backBtn} onClick={handleBack}>
-          ← {t("Back")}
-        </button>
         <h1>{t("Settings")}</h1>
       </div>
 
