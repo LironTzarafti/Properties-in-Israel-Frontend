@@ -2,57 +2,10 @@
 // API Service - שירות לתקשורת עם השרת
 // ========================================
 
+import { toast } from 'react-toastify';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://properties-in-israel-backend.onrender.com/api';
 
-// ========================================
-// ✅ מערכת רענון אוטומטי של טוקן
-// ========================================
-let isRefreshing = false;
-let refreshSubscribers = [];
-
-// פונקציה להוספת בקשות שמחכות לרענון
-const subscribeTokenRefresh = (callback) => {
-  refreshSubscribers.push(callback);
-};
-
-// פונקציה לעדכון כל הבקשות שחיכו עם הטוקן החדש
-const onTokenRefreshed = (newToken) => {
-  refreshSubscribers.forEach(callback => callback(newToken));
-  refreshSubscribers = [];
-};
-
-// פונקציה לרענון הטוקן
-const refreshAccessToken = async () => {
-  try {
-    console.log('🔄 [API] מנסה לרענן Access Token...');
-    
-    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
-      method: 'POST',
-      credentials: 'include', // ✅ חשוב! שולח את הקוקי
-      headers: { 'Content-Type': 'application/json' }
-    });
-    
-    if (!response.ok) {
-      throw new Error('Refresh נכשל');
-    }
-    
-    const data = await response.json();
-    
-    if (data.token) {
-      localStorage.setItem('token', data.token);
-      console.log('✅ [API] Access Token רוענן בהצלחה');
-      return data.token;
-    }
-    
-    throw new Error('לא התקבל טוקן חדש');
-  } catch (error) {
-    console.error('❌ [API] שגיאה ברענון טוקן:', error);
-    // במקרה של כשלון - מנקים הכל ומנתקים
-    localStorage.removeItem('token');
-    window.location.href = '/login';
-    throw error;
-  }
-};
 
 // ========================================
 // פונקציה עזר ליצירת headers עם token
@@ -66,50 +19,35 @@ const getAuthHeaders = () => {
 };
 
 // ========================================
-// ✅ פונקציה משופרת לטיפול בתגובות עם רענון אוטומטי
+// ✅ פונקציה פשוטה לטיפול בתגובות
 // ========================================
-const handleResponse = async (response, originalRequest) => {
-  // אם הבקשה הצליחה - פשוט נחזיר את הנתונים
+const handleResponse = async (response) => {
+  // אם הבקשה הצליחה - נחזיר את הנתונים
   if (response.ok) {
     return await response.json();
   }
   
-  // ✅ אם קיבלנו 401 (Unauthorized) - ננסה לרענן
-  if (response.status === 401 && originalRequest) {
-    console.warn('⚠️ [API] קיבלתי 401 - מנסה רענון אוטומטי...');
+  // ✅ אם קיבלנו 401 - מציג הודעה ידידותית ומנתק
+  if (response.status === 401) {
+    console.warn('⚠️ [API] קיבלתי 401 - הטוקן פג תוקף, מנתק...');
     
-    // אם כבר יש תהליך רענון בעבודה - נמתין לו
-    if (isRefreshing) {
-      console.log('⏳ [API] כבר יש רענון בעבודה, ממתין...');
-      return new Promise((resolve) => {
-        subscribeTokenRefresh((newToken) => {
-          // לאחר הרענון - ננסה שוב את הבקשה המקורית
-          originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-          resolve(fetch(originalRequest.url, originalRequest).then(r => r.json()));
-        });
-      });
-    }
+    // ✅ הודעה ידידותית למשתמש
+    toast.info('⏰ פג תוקף החיבור - נא להתחבר מחדש', {
+      position: 'top-center',
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeButton: true,
+      pauseOnHover: true,
+    });
     
-    // אם זה הניסיון הראשון - נתחיל רענון
-    isRefreshing = true;
+    localStorage.removeItem('token');
     
-    try {
-      const newToken = await refreshAccessToken();
-      isRefreshing = false;
-      
-      // עדכון כל הבקשות שחיכו
-      onTokenRefreshed(newToken);
-      
-      // ניסיון חוזר של הבקשה המקורית
-      originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-      const retryResponse = await fetch(originalRequest.url, originalRequest);
-      return await retryResponse.json();
-      
-    } catch (refreshError) {
-      isRefreshing = false;
-      refreshSubscribers = [];
-      throw new Error('נדרשת התחברות מחדש');
-    }
+    // ✅ המתנה קצרה כדי שהמשתמש יראה את ההודעה
+    setTimeout(() => {
+      window.location.href = '/login';
+    }, 500);
+    
+    throw new Error('נדרשת התחברות מחדש');
   }
   
   // שגיאות אחרות
@@ -118,21 +56,21 @@ const handleResponse = async (response, originalRequest) => {
 };
 
 // ========================================
-// ✅ פונקציה עזר לביצוע fetch עם טיפול חכם בשגיאות
+// ✅ פונקציה פשוטה לביצוע fetch
 // ========================================
-const fetchWithAutoRefresh = async (url, options = {}) => {
+const simpleFetch = async (url, options = {}) => {
   const requestStartTime = Date.now();
   
   try {
     const response = await fetch(url, options);
     
-    // ✅ אם הבקשה לקחה יותר מ-5 שניות (השרת התעורר)
+    // ✅ אם הבקשה לקחה יותר מ-5 שניות (השרת התעורר מ-sleep)
     const requestDuration = Date.now() - requestStartTime;
     if (requestDuration > 5000) {
-      console.log('☕ [API] הבקשה לקחה', Math.round(requestDuration / 1000), 'שניות - השרת התעורר');
+      console.log('☕ [API] הבקשה לקחה', Math.round(requestDuration / 1000), 'שניות - השרת התעורר מ-sleep');
     }
     
-    return await handleResponse(response, options);
+    return await handleResponse(response);
   } catch (error) {
     throw error;
   }
@@ -148,7 +86,6 @@ const fetchWithAutoRefresh = async (url, options = {}) => {
 export const login = async (email, password) => {
   const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
-    credentials: 'include', // ✅ חשוב! מקבל את הקוקי
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
   });
@@ -168,7 +105,6 @@ export const login = async (email, password) => {
 export const register = async (name, email, password) => {
   const response = await fetch(`${API_BASE_URL}/auth/register`, {
     method: 'POST',
-    credentials: 'include', // ✅ חשוב! מקבל את הקוקי
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password })
   });
@@ -186,9 +122,8 @@ export const register = async (name, email, password) => {
  * קבלת פרטי המשתמש המחובר
  */
 export const getMe = async () => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/auth/me`, {
+  return simpleFetch(`${API_BASE_URL}/auth/me`, {
     method: 'GET',
-    credentials: 'include',
     headers: getAuthHeaders()
   });
 };
@@ -201,7 +136,6 @@ export const logout = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/logout`, {
       method: 'POST',
-      credentials: 'include', // ✅ חשוב! מוחק את הקוקי
       headers: getAuthHeaders()
     });
     
@@ -222,58 +156,52 @@ export const logout = async () => {
 // ========================================
 
 export const getPublicProperties = async () => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/properties/public`, {
+  return simpleFetch(`${API_BASE_URL}/properties/public`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' }
   });
 };
 
 export const getProperties = async () => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/properties`, {
+  return simpleFetch(`${API_BASE_URL}/properties`, {
     method: 'GET',
-    credentials: 'include',
     headers: getAuthHeaders()
   });
 };
 
 export const getPropertyById = async (id) => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/properties/${id}`, {
+  return simpleFetch(`${API_BASE_URL}/properties/${id}`, {
     method: 'GET',
-    credentials: 'include',
     headers: getAuthHeaders()
   });
 };
 
 export const createProperty = async (propertyData) => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/properties`, {
+  return simpleFetch(`${API_BASE_URL}/properties`, {
     method: 'POST',
-    credentials: 'include',
     headers: getAuthHeaders(),
     body: JSON.stringify(propertyData)
   });
 };
 
 export const updateProperty = async (id, propertyData) => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/properties/${id}`, {
+  return simpleFetch(`${API_BASE_URL}/properties/${id}`, {
     method: 'PUT',
-    credentials: 'include',
     headers: getAuthHeaders(),
     body: JSON.stringify(propertyData)
   });
 };
 
 export const deleteProperty = async (id) => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/properties/${id}`, {
+  return simpleFetch(`${API_BASE_URL}/properties/${id}`, {
     method: 'DELETE',
-    credentials: 'include',
     headers: getAuthHeaders()
   });
 };
 
 export const updatePropertyStatus = async (id, status) => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/properties/${id}/status`, {
+  return simpleFetch(`${API_BASE_URL}/properties/${id}/status`, {
     method: 'PATCH',
-    credentials: 'include',
     headers: getAuthHeaders(),
     body: JSON.stringify({ status })
   });
@@ -284,17 +212,15 @@ export const updatePropertyStatus = async (id, status) => {
 // ========================================
 
 export const getFavorites = async () => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/favorites`, {
+  return simpleFetch(`${API_BASE_URL}/favorites`, {
     method: 'GET',
-    credentials: 'include',
     headers: getAuthHeaders()
   });
 };
 
 export const toggleFavoriteAPI = async (propertyId) => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/favorites/${propertyId}`, {
+  return simpleFetch(`${API_BASE_URL}/favorites/${propertyId}`, {
     method: 'POST',
-    credentials: 'include',
     headers: getAuthHeaders()
   });
 };
@@ -320,14 +246,13 @@ export const getNotifications = async () => {
   notificationsRequestInProgress = true;
 
   try {
-    const response = await fetchWithAutoRefresh(`${API_BASE_URL}/notifications`, {
+    const response = await simpleFetch(`${API_BASE_URL}/notifications`, {
       method: 'GET',
-      credentials: 'include',
       headers: getAuthHeaders(),
     });
 
     notificationsRequestInProgress = false;
-    retryCount = 0; // אפס את הספירה לאחר הצלחה
+    retryCount = 0;
     return response;
 
   } catch (error) {
@@ -336,21 +261,20 @@ export const getNotifications = async () => {
     // טיפול ב-429 – Too Many Requests
     if (error?.response?.status === 429 && retryCount < MAX_RETRIES) {
       retryCount++;
-      const waitTime = Math.pow(2, retryCount) * 1000; // exponential backoff: 1s, 2s
+      const waitTime = Math.pow(2, retryCount) * 1000;
       console.warn(`⚠️ [Notifications] 429 – מחכה ${waitTime / 1000} שניות לפני retry #${retryCount}`);
       await new Promise(resolve => setTimeout(resolve, waitTime));
       return getNotifications();
     }
 
-    // אם לא הצלחנו אחרי MAX_RETRIES או שגיאה אחרת
     console.error("❌ [Notifications] שגיאה בטעינת התראות:", error);
-    return null; // לא לזרוק שגיאה שתשבור את האפליקציה
+    return null;
   }
 };
 
 // פונקציה להפעלה של polling חכם
 export const startNotificationsPolling = () => {
-  if (pollingTimer) return; // אם כבר פועל – אל תפעיל שוב
+  if (pollingTimer) return;
 
   pollingTimer = setInterval(async () => {
     const data = await getNotifications();
@@ -373,31 +297,25 @@ export const stopNotificationsPolling = () => {
 // ==========================
 
 export const markNotificationAsRead = async (notificationId) => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/notifications/${notificationId}/read`, {
+  return simpleFetch(`${API_BASE_URL}/notifications/${notificationId}/read`, {
     method: 'PUT',
-    credentials: 'include',
     headers: getAuthHeaders()
   });
 };
 
 export const markAllNotificationsAsRead = async () => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/notifications/read-all`, {
+  return simpleFetch(`${API_BASE_URL}/notifications/read-all`, {
     method: 'PUT',
-    credentials: 'include',
     headers: getAuthHeaders()
   });
 };
 
 export const deleteNotificationAPI = async (notificationId) => {
-  return fetchWithAutoRefresh(`${API_BASE_URL}/notifications/${notificationId}`, {
+  return simpleFetch(`${API_BASE_URL}/notifications/${notificationId}`, {
     method: 'DELETE',
-    credentials: 'include',
     headers: getAuthHeaders()
   });
 };
-
-
-
 
 // ========================================
 // Users API
@@ -406,7 +324,6 @@ export const deleteNotificationAPI = async (notificationId) => {
 export const deleteAccount = async () => {
   const response = await fetch(`${API_BASE_URL}/auth/account`, {
     method: 'DELETE',
-    credentials: 'include',
     headers: getAuthHeaders()
   });
   
